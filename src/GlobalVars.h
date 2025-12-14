@@ -33,6 +33,8 @@
 #include "sensors/SensorManager.h"
 #include "status/LEDManager.h"
 #include "status/StatusManager.h"
+#include "tftdisplay/TFTManager.h"
+#include "tftdisplay/TDBattery.h"
 
 extern Timer<> globalTimer;
 extern SlimeVR::LEDManager ledManager;
@@ -44,3 +46,5 @@ extern SlimeVR::Network::Connection networkConnection;
 extern BatteryMonitor battery;
 extern SlimeVR::WiFiNetwork wifiNetwork;
 extern SlimeVR::WifiProvisioning wifiProvisioning;
+extern SlimeVR::TFTManager tftManager;
+extern SlimeVR::TDBattery tdBattery;

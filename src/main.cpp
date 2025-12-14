@@ -33,6 +33,10 @@
 #include "ota.h"
 #include "serial/serialcommands.h"
 #include "status/TPSCounter.h"
+#include "tftdisplay/TFTManager.h"
+#include "tftdisplay/TDBattery.h"
+
+
 
 Timer<> globalTimer;
 SlimeVR::Logging::Logger logger("SlimeVR");
@@ -44,6 +48,8 @@ SlimeVR::Network::Manager networkManager;
 SlimeVR::Network::Connection networkConnection;
 SlimeVR::WiFiNetwork wifiNetwork;
 SlimeVR::WifiProvisioning wifiProvisioning;
+SlimeVR::TFTManager tftManager;
+SlimeVR::TDBattery tdBattery;
 
 #if DEBUG_MEASURE_SENSOR_TIME_TAKEN
 SlimeVR::Debugging::TimeTakenMeasurer sensorMeasurer{"Sensors"};
@@ -67,6 +73,9 @@ void setup() {
 	Serial.println();
 
 	logger.info("SlimeVR v" FIRMWARE_VERSION " starting up...");
+	tftManager.setupState(true);
+	tftManager.setup();
+	logger.info("i2C SDA PIN %d , SCL PIN %d" , PIN_IMU_SDA, PIN_IMU_SCL);
 
 	char vendorBuffer[512];
 	size_t writtenLength;
@@ -97,14 +106,18 @@ void setup() {
 			UPDATE_ADDRESS,
 			UPDATE_NAME
 		);
+		tftManager.drawLog(String(vendorBuffer) + String(writtenLength) + ", firmware update url: " + UPDATE_ADDRESS + ", name: " + UPDATE_NAME);
 	}
 	logger.info("%s", vendorBuffer);
-
+	tftManager.drawLog("Starting up . . .");
 	statusManager.setStatus(SlimeVR::Status::LOADING, true);
-
+	
+	tftManager.drawLog("Setup LED Manager . . .");
 	ledManager.setup();
+	tftManager.drawLog("configuration device . . .");
 	configuration.setup();
-
+	
+	tftManager.drawLog("make serial communication . . .");
 	SerialCommands::setUp();
 	// Make sure the bus isn't stuck when resetting ESP without powering it down
 	// Fixes I2C issues for certain IMUs. Previously this feature was enabled for
@@ -113,6 +126,7 @@ void setup() {
 	auto clearResult = I2CSCAN::clearBus(PIN_IMU_SDA, PIN_IMU_SCL);
 	if (clearResult != 0) {
 		logger.warn("Can't clear I2C bus, error %d", clearResult);
+		tftManager.drawLog("Can't clear I2C bus, error " + clearResult);
 	}
 
 	// join I2C bus
@@ -138,20 +152,26 @@ void setup() {
 	// Wait for IMU to boot
 	delay(500);
 
+	tftManager.drawLog("running sensor setup");
 	sensorManager.setup();
 
+	tftManager.drawLog("network setup. . .");
 	networkManager.setup();
 	OTA::otaSetup(otaPassword);
+	logger.info("Battery Sense Mode %s , Pin %d", BATTERY_MONITOR==1?"EXTERNAL":"INTERNAL", PIN_BATTERY_LEVEL);
 	battery.Setup();
+	tdBattery.setup();
 
 	statusManager.setStatus(SlimeVR::Status::LOADING, false);
 
+	tftManager.drawLog("configuration sensors . . .");
 	sensorManager.postSetup();
 
 	loopTime = micros();
 	tpsCounter.reset();
+	tftManager.drawLog("done . . . ");
+	tftManager.setupState(false);
 }
-
 void loop() {
 	tpsCounter.update();
 	globalTimer.tick();
@@ -170,6 +190,8 @@ void loop() {
 	battery.Loop();
 	ledManager.update();
 	I2CSCAN::update();
+	tftManager.update();
+	tdBattery.update();
 #ifdef TARGET_LOOPTIME_MICROS
 	long elapsed = (micros() - loopTime);
 	if (elapsed < TARGET_LOOPTIME_MICROS) {
