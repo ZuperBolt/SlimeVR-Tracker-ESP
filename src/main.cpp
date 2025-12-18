@@ -73,9 +73,10 @@ void setup() {
 	Serial.println();
 
 	logger.info("SlimeVR v" FIRMWARE_VERSION " starting up...");
-	tftManager.setupState(true);
-	tftManager.setup();
+	
 	logger.info("i2C SDA PIN %d , SCL PIN %d" , PIN_IMU_SDA, PIN_IMU_SCL);
+	pinMode(PIN_IMU_SDA, INPUT_PULLUP);
+	pinMode(PIN_IMU_SCL, INPUT_PULLUP);
 
 	char vendorBuffer[512];
 	size_t writtenLength;
@@ -106,15 +107,15 @@ void setup() {
 			UPDATE_ADDRESS,
 			UPDATE_NAME
 		);
-		tftManager.drawLog(String(vendorBuffer) + String(writtenLength) + ", firmware update url: " + UPDATE_ADDRESS + ", name: " + UPDATE_NAME);
+		//tftManager.drawLog(String(vendorBuffer) + String(writtenLength) + ", firmware update url: " + UPDATE_ADDRESS + ", name: " + UPDATE_NAME);
 	}
 	logger.info("%s", vendorBuffer);
-	tftManager.drawLog("Starting up . . .");
+	//tftManager.drawLog("Starting up . . .");
 	statusManager.setStatus(SlimeVR::Status::LOADING, true);
 	
-	tftManager.drawLog("Setup LED Manager . . .");
+	//tftManager.drawLog("Setup LED Manager . . .");
 	ledManager.setup();
-	tftManager.drawLog("configuration device . . .");
+	//tftManager.drawLog("configuration device . . .");
 	configuration.setup();
 	
 	tftManager.drawLog("make serial communication . . .");
@@ -152,25 +153,27 @@ void setup() {
 	// Wait for IMU to boot
 	delay(500);
 
-	tftManager.drawLog("running sensor setup");
+	//tftManager.drawLog("running sensor setup");
 	sensorManager.setup();
 
-	tftManager.drawLog("network setup. . .");
+	//tftManager.setupState(true);
+	//tftManager.setup();
+	//tftManager.drawLog("network setup. . .");
 	networkManager.setup();
 	OTA::otaSetup(otaPassword);
 	logger.info("Battery Sense Mode %s , Pin %d", BATTERY_MONITOR==1?"EXTERNAL":"INTERNAL", PIN_BATTERY_LEVEL);
 	battery.Setup();
-	tdBattery.setup();
+	//tdBattery.setup();
 
 	statusManager.setStatus(SlimeVR::Status::LOADING, false);
 
-	tftManager.drawLog("configuration sensors . . .");
+	//tftManager.drawLog("configuration sensors . . .");
 	sensorManager.postSetup();
 
 	loopTime = micros();
 	tpsCounter.reset();
-	tftManager.drawLog("done . . . ");
-	tftManager.setupState(false);
+	//tftManager.drawLog("done . . . ");
+	//tftManager.setupState(false);
 }
 void loop() {
 	tpsCounter.update();
@@ -190,7 +193,7 @@ void loop() {
 	battery.Loop();
 	ledManager.update();
 	I2CSCAN::update();
-	tftManager.update();
+	//tftManager.update();
 	tdBattery.update();
 #ifdef TARGET_LOOPTIME_MICROS
 	long elapsed = (micros() - loopTime);

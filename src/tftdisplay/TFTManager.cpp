@@ -4,6 +4,7 @@
 namespace SlimeVR {
 
 void TFTManager::drawWelcome() {
+    return; //disabled for now
     tft.fillScreen(TFT_BLACK);
     tft.drawString("v." FIRMWARE_VERSION, 0, 0, 1);
     tft.setTextSize(4.0f);
@@ -17,6 +18,7 @@ void TFTManager::drawWelcome() {
     tft.drawCentreString("SlimeVR", displayW / 2, 93, 1);
 }
 void TFTManager::setup() {
+    return; //disabled for now
     tft.init();
     tftLog.info("TFT setup detail PIN CS %d , SCLK %d, MOSI %d, MISO %d , RST %d", TFT_CS, TFT_SCLK, TFT_MOSI, TFT_MISO, TFT_RST);
     tft.setRotation(1);
@@ -27,6 +29,7 @@ void TFTManager::setup() {
 }
 
 void TFTManager::update() {
+    return; //disabled for now
     curMillis = millis();
     if(drawCycle < drawActive) { drawCycle++; return; }
     drawCycle = 0; //RESET cycle

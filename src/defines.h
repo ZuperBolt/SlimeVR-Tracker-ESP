@@ -30,7 +30,8 @@
 #define IMU IMU_ICM45686
 #endif
 #ifndef SECOND_IMU
-#define SECOND_IMU IMU_ICM45686
+//#define SECOND_IMU IMU_ICM45686
+#define SECOND_IMU IMU
 #endif
 #ifndef BOARD
 #define BOARD BOARD_SLIMEVR_V1_2
@@ -49,7 +50,7 @@
 #define SECONDARY_IMU_OPTIONAL true
 #endif
 
-#define MAX_IMU_COUNT 2
+#define MAX_IMU_COUNT 1
 #ifndef IMU_DESC_LIST
 #define IMU_DESC_LIST \
     IMU_DESC_ENTRY(IMU,        PRIMARY_IMU_ADDRESS_ONE,   IMU_ROTATION,        PIN_IMU_SCL, PIN_IMU_SDA, PRIMARY_IMU_OPTIONAL,   PIN_IMU_INT) \
@@ -83,10 +84,11 @@
 // #define BATTERY_SHIELD_R2 40.2
 
 // ------------------------------
-#if  BOARD == BOARD_TTGO_TBASE
+//#ifndef BOARD == BOARD_TTGO_TBASE
 
-#define PIN_IMU_SDA 21
-#define PIN_IMU_SCL 22
+#define PIN_IMU_SDA 21 //21
+#define PIN_IMU_SCL 22 // 22
+#define PIN_IMU_INT 2
 #define PIN_BATTERY_LEVEL 34
 
-#endif
+//#endif
