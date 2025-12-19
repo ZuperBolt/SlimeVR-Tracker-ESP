@@ -77,6 +77,7 @@ void setup() {
 	logger.info("i2C SDA PIN %d , SCL PIN %d" , PIN_IMU_SDA, PIN_IMU_SCL);
 	pinMode(PIN_IMU_SDA, INPUT_PULLUP);
 	pinMode(PIN_IMU_SCL, INPUT_PULLUP);
+	Wire.begin(PIN_IMU_SDA, PIN_IMU_SCL);
 
 	char vendorBuffer[512];
 	size_t writtenLength;
@@ -118,7 +119,7 @@ void setup() {
 	//tftManager.drawLog("configuration device . . .");
 	configuration.setup();
 	
-	tftManager.drawLog("make serial communication . . .");
+	//tftManager.drawLog("make serial communication . . .");
 	SerialCommands::setUp();
 	// Make sure the bus isn't stuck when resetting ESP without powering it down
 	// Fixes I2C issues for certain IMUs. Previously this feature was enabled for
@@ -127,7 +128,7 @@ void setup() {
 	auto clearResult = I2CSCAN::clearBus(PIN_IMU_SDA, PIN_IMU_SCL);
 	if (clearResult != 0) {
 		logger.warn("Can't clear I2C bus, error %d", clearResult);
-		tftManager.drawLog("Can't clear I2C bus, error " + clearResult);
+		//tftManager.drawLog("Can't clear I2C bus, error " + clearResult);
 	}
 
 	// join I2C bus
